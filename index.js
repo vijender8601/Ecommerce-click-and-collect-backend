@@ -57,6 +57,7 @@ server.use("/categories", isAuth(), categoriesRouter.router);
 server.use("/auth", authRouter.router);
 server.use("/cart", isAuth(), cartRouter.router);
 server.use("/orders", isAuth(), orderRouter.router);
+server.get('*', (req, res) => res.sendFile(path.resolve('build', 'index.html')));
 
 // passport
 passport.use('local',
