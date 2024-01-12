@@ -90,7 +90,8 @@ exports.resetPassword = async (req, res) => {
 
   if(user)
   {
-    var salt = crypto.randomBytes(16);
+    try{
+      var salt = crypto.randomBytes(16);
     
       crypto.pbkdf2(
         password,
@@ -109,8 +110,12 @@ exports.resetPassword = async (req, res) => {
           res.json(response);
 
         });
+    } catch(err)
+    {
+      res.status(400).json(err);
+    }
   } else {
-    res.sendStatus(401);
+    res.sendStatus(401).json("user not found");
   }
 
   
