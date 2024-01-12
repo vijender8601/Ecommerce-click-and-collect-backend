@@ -1,7 +1,7 @@
 const { User } = require("../model/User");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-const { sanitizeUser } = require("../services/Common");
+const { sanitizeUser, sendMail } = require("../services/Common");
 const SECRET_KEY = "SECRET_KEY";
 
 exports.createUser = async (req, res) => {
@@ -55,3 +55,71 @@ exports.checkAuth = async (req, res) => {
     res.sendStatus(401);
   }
 };
+
+exports.resetPasswordRequest = async (req, res) => {
+  const email = req.body.email;
+  const user = await User.findOne({email: email});
+
+  if(user)
+  {
+      const token = crypto.randomBytes(48).toString('hex');
+      user.resetPasswordToken = token;
+      await user.save();
+      const resetPage = "http://localhost:3000/reset-password?token="+token+"&email="+email;
+      const html = `<p>Click <a href=${resetPage}>here</a> to Reset password</p>`;
+      const subject = "reset password for Click & Collect";
+
+      // we have to send email and token in the email id to cerify that user has click to right link
+      if(email)
+      {
+        const response = await sendMail({to: email, subject, html});
+        res.json(response);
+      } else {
+        res.sendStatus(400);
+      }
+  } else {
+    res.sendStatus(401);
+  }
+
+  
+};
+
+exports.resetPassword = async (req, res) => {
+  const {email, token, password} = req.body;
+  const user = await User.findOne({email: email, resetPasswordToken: token});
+
+  if(user)
+  {
+    var salt = crypto.randomBytes(16);
+    
+      crypto.pbkdf2(
+        password,
+        salt,
+        310000,
+        32,
+        "sha256",
+        async function (err, hashedPassword) {
+          user.password = hashedPassword;
+          user.salt = salt;
+          await user.save();
+
+          const html = `<p>Password reset successfully</p>`;
+          const subject = "Successfully reset password of Click & Collect";
+          const response = await sendMail({to: email, subject, html});
+          res.json(response);
+
+        });
+  } else {
+    res.sendStatus(401);
+  }
+
+  
+};
+
+exports.logout = async (req, res) => {
+  res.cookie("jwt", null, {
+    expires: new Date(Date.now()),
+    httpOnly: true,
+  })
+  .sendStatus(200)
+}

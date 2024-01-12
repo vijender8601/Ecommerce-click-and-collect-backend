@@ -7,9 +7,10 @@ const userSchema = new Schema({
     role : {type: String, required: true, default:'user'},
     addresses : {type: [Schema.Types.Mixed]}, // TODO : we can make seperate schema for this
     name : {type: String, default: "Guest user"},
-    salt: Buffer
+    salt: Buffer,
+    resetPasswordToken: {type: String, default: ''}
 
-})
+}, {timestamps: true})
 
 const virtual = userSchema.virtual('id');
 

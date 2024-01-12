@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const session = require("express-session");
 const passport = require("passport");
 const cookieParser = require('cookie-parser');
+const nodemailer = require('nodemailer');
 const LocalStrategy = require("passport-local").Strategy;
 const crypto = require("crypto");
 const JwtStrategy = require('passport-jwt').Strategy;
@@ -57,6 +58,7 @@ server.use("/categories", isAuth(), categoriesRouter.router);
 server.use("/auth", authRouter.router);
 server.use("/cart", isAuth(), cartRouter.router);
 server.use("/orders", isAuth(), orderRouter.router);
+
 server.get('*', (req, res) => res.sendFile(path.resolve('build', 'index.html')));
 
 // passport
@@ -182,6 +184,7 @@ server.post("/create-payment-intent", async (req, res) => {
 
 
 // connect with db
+
 main().catch((err) => console.log(err));
 
 async function main() {
