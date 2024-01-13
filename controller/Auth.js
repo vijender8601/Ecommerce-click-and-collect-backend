@@ -59,14 +59,13 @@ exports.checkAuth = async (req, res) => {
 exports.resetPasswordRequest = async (req, res) => {
   const email = req.body.email;
   const user = await User.findOne({email: email});
-//https://ecommerce-click-and-co-git-274371-vijender-srivastavas-projects.vercel.app/
 
   if(user)
   {
       const token = crypto.randomBytes(48).toString('hex');
       user.resetPasswordToken = token;
       await user.save();
-      const resetPage = "https://ecommerce-click-and-co-git-274371-vijender-srivastavas-projects.vercel.app/reset-password?token="+token+"&email="+email;
+      const resetPage = "https://clickandcollect.onrender.com/reset-password?token="+token+"&email="+email;
       const html = `<p>Click <a href=${resetPage}>here</a> to Reset password</p>`;
       const subject = "reset password for Click & Collect";
 
