@@ -47,7 +47,7 @@ exports.loginUser = async (req, res) => {
 };
 
 exports.checkAuth = async (req, res) => {
-  // console.log("here", req.user);
+  console.log("here", req.user);
   if(req.user)
   {
     res.json(req.user);
@@ -60,6 +60,7 @@ exports.resetPasswordRequest = async (req, res) => {
   const email = req.body.email;
   const user = await User.findOne({email: email});
 //https://ecommerce-click-and-co-git-274371-vijender-srivastavas-projects.vercel.app/
+
   if(user)
   {
       const token = crypto.randomBytes(48).toString('hex');
@@ -122,9 +123,16 @@ exports.resetPassword = async (req, res) => {
 };
 
 exports.logout = async (req, res) => {
+  // res.cookie("jwt", null, {
+  //   expires: new Date(Date.now()),
+  //   httpOnly: true,
+  // })
+  // .sendStatus(200)
+
   res.cookie("jwt", null, {
-    expires: new Date(Date.now()),
-    httpOnly: true,
-  })
-  .sendStatus(200)
+    httpOnly: true, 
+    secure: true,
+    sameSite: "none",    
+    expires: new Date(1)
+}).sendStatus(200);
 }
